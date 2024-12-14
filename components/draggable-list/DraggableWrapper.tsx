@@ -32,22 +32,42 @@ export const DraggableWrapper = ({
     | undefined
   >(undefined);
 
+  const between = (
+    value: number,
+    lowerBound: number,
+    upperBound: number,
+    inclusive = true
+  ) => {
+    "worklet";
+    if (inclusive) {
+      return value >= lowerBound && value <= upperBound;
+    }
+    return value > lowerBound && value < upperBound;
+  };
+
   const translateY = useDerivedValue(() => {
     // if index is equal to start index and pan is currently active, return the dragged offset.
-    if (index === data.startIndex.value && data.active.value) {
-      return data.draggedOffset.value;
+    if (data.active.value) {
+      if (index === data.startIndex.value) {
+        return data.draggedOffset.value;
+      } else if (data.currentIndex.value !== data.startIndex.value) {
+        const lower = Math.min(data.currentIndex.value, data.startIndex.value);
+        const upper = Math.max(data.currentIndex.value, data.startIndex.value);
+        if (between(index, lower, upper)) {
+          const translateBy =
+            data.startIndex.value > data.currentIndex.value
+              ? data.rowHeight
+              : -data.rowHeight;
+          return withTiming(translateBy, { duration: 200 });
+        }
+      }
     }
     return withTiming(0, { duration: 200 });
   });
 
   const style = useAnimatedStyle(() => {
     return {
-      transform: [
-        {
-          scale: data.active.value && index === data.startIndex.value ? 1.3 : 1,
-        },
-        { translateY: translateY.value },
-      ],
+      transform: [{ translateY: translateY.value }],
     };
   });
 

@@ -1,5 +1,10 @@
 import { createContext, useContext, useState } from "react";
-import { makeMutable, SharedValue } from "react-native-reanimated";
+import {
+  clamp,
+  makeMutable,
+  SharedValue,
+  useAnimatedReaction,
+} from "react-native-reanimated";
 
 type DraggableListContextType = {
   active: SharedValue<boolean>;
@@ -44,6 +49,21 @@ export const DraggableListProvider = ({
     y: 0,
     h: 0,
   });
+
+  useAnimatedReaction(
+    () => {
+      // calculate the current index based on the dragged offset
+      const index = Math.round(draggedOffset.value / rowHeight);
+      return index;
+    },
+    (cv, pv) => {
+      if (cv !== pv) {
+        // TODO update the max to the data length
+        currentIndex.value = clamp(startIndex.value + cv, 0, 99);
+        console.log(currentIndex.value);
+      }
+    }
+  );
 
   return (
     <DraggableListContext.Provider

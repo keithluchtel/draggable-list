@@ -13,14 +13,19 @@ export default function DraggableScreen() {
       return (
         <DraggableWrapper index={index}>
           <Reanimated.View
-            style={{ backgroundColor: item.color, height: 100, opacity: 0.5 }}
-          />
+            style={{ paddingVertical: 2, paddingHorizontal: 10 }}
+          >
+            <Reanimated.View
+              style={{ backgroundColor: item.color, height: 100, padding: 20 }}
+            />
+          </Reanimated.View>
         </DraggableWrapper>
       );
     },
     []
   );
 
+  console.log("RENDER");
   return (
     <ThemedView>
       <DraggableListProvider rowHeight={100}>
