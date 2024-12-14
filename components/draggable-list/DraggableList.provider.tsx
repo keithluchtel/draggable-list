@@ -3,9 +3,13 @@ import { makeMutable, SharedValue } from "react-native-reanimated";
 
 type DraggableListContextType = {
   active: SharedValue<boolean>;
-  activeIndex: SharedValue<number>;
-  draggedIndex: SharedValue<number>;
+  startIndex: SharedValue<number>;
+  currentIndex: SharedValue<number>;
   draggedOffset: SharedValue<number>;
+  draggedItem: SharedValue<{
+    y: number;
+    h: number;
+  }>;
   rowHeight: number;
 };
 const DraggableListContext = createContext<
@@ -33,13 +37,24 @@ export const DraggableListProvider = ({
   children,
 }: DraggableListProviderProps) => {
   const active = makeMutable(false);
-  const activeIndex = makeMutable(0);
-  const draggedIndex = makeMutable(0);
+  const startIndex = makeMutable(0);
+  const currentIndex = makeMutable(0);
   const draggedOffset = makeMutable(0);
+  const draggedItem = makeMutable({
+    y: 0,
+    h: 0,
+  });
 
   return (
     <DraggableListContext.Provider
-      value={{ active, activeIndex, draggedIndex, draggedOffset, rowHeight }}
+      value={{
+        active,
+        startIndex,
+        currentIndex,
+        draggedOffset,
+        rowHeight,
+        draggedItem,
+      }}
     >
       {children}
     </DraggableListContext.Provider>

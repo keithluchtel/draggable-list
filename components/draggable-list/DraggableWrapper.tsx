@@ -2,6 +2,7 @@ import Animated, {
   useAnimatedReaction,
   useAnimatedRef,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
@@ -18,9 +19,7 @@ export const DraggableWrapper = ({
   index,
 }: DraggableWrapperProps) => {
   const data = useDraggableListContext();
-  const translateY = useSharedValue(0);
   const ref = useAnimatedRef<Animated.View>();
-  const swapDistance = data.rowHeight / 2;
   const position = useSharedValue<
     | {
         x: number;
@@ -33,12 +32,19 @@ export const DraggableWrapper = ({
     | undefined
   >(undefined);
 
+  const translateY = useDerivedValue(() => {
+    // if index is equal to start index and pan is currently active, return the dragged offset.
+    if (index === data.startIndex.value && data.active.value) {
+      return data.draggedOffset.value;
+    }
+    return withTiming(0, { duration: 200 });
+  });
+
   const style = useAnimatedStyle(() => {
     return {
       transform: [
         {
-          scale:
-            data.active.value && index === data.activeIndex.value ? 1.3 : 1,
+          scale: data.active.value && index === data.startIndex.value ? 1.3 : 1,
         },
         { translateY: translateY.value },
       ],
@@ -50,27 +56,22 @@ export const DraggableWrapper = ({
       position.value = undefined;
       const measurements = ref.current?.measure(
         (x, y, width, height, pageX, pageY) => {
-          position.value = {
-            x,
-            y,
-            w: width,
+          data.draggedItem.value = {
+            y: y,
             h: height,
-            px: pageX,
-            py: pageY,
           };
         }
       );
       data.active.value = true;
-      data.activeIndex.value = index;
-      data.draggedIndex.value = index;
-      translateY.value = 0;
+      data.startIndex.value = index;
+      data.currentIndex.value = index;
+      data.draggedOffset.value = 0;
     })
     .onUpdate((event) => {
-      translateY.value = event.translationY;
+      data.draggedOffset.value = event.translationY;
     })
     .onFinalize(() => {
       data.active.value = false;
-      translateY.value = withTiming(0, { duration: 200 });
     });
 
   return (
