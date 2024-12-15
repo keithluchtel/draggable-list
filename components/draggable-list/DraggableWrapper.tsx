@@ -108,15 +108,7 @@ export const DraggableWrapper = ({
 
   return (
     <GestureDetector gesture={index === 3 ? gesture : Gesture.Race()}>
-      <Animated.View
-        ref={ref}
-        style={style}
-        onLayout={() => {
-          if (index === 3) {
-            console.log("LAYOUT");
-          }
-        }}
-      >
+      <Animated.View ref={ref} style={style}>
         {children}
       </Animated.View>
     </GestureDetector>

@@ -26,7 +26,6 @@ export default function DraggableScreen() {
   );
 
   const onItemMoved = (from: number, to: number) => {
-    console.log("ITEM MOVED", from, to);
     setData((prev) => {
       const newData = [...prev];
       newData.splice(to, 0, newData.splice(from, 1)[0]);
@@ -34,7 +33,6 @@ export default function DraggableScreen() {
     });
   };
 
-  console.log("RENDER");
   return (
     <ThemedView>
       <DraggableListProvider rowHeight={100} onItemMoved={onItemMoved}>
