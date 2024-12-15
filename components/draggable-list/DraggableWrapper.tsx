@@ -1,4 +1,5 @@
 import Animated, {
+  LinearTransition,
   useAnimatedReaction,
   useAnimatedRef,
   useAnimatedStyle,
@@ -32,6 +33,7 @@ export const DraggableWrapper = ({
     | undefined
   >(undefined);
 
+  // replace with redash
   const between = (
     value: number,
     lowerBound: number,
@@ -50,7 +52,9 @@ export const DraggableWrapper = ({
     if (data.active.value) {
       if (index === data.startIndex.value) {
         return data.draggedOffset.value;
-      } else if (data.currentIndex.value !== data.startIndex.value) {
+      }
+
+      if (data.currentIndex.value !== data.startIndex.value) {
         const lower = Math.min(data.currentIndex.value, data.startIndex.value);
         const upper = Math.max(data.currentIndex.value, data.startIndex.value);
         if (between(index, lower, upper)) {
@@ -92,11 +96,20 @@ export const DraggableWrapper = ({
     })
     .onFinalize(() => {
       data.active.value = false;
+      data.onDragComplete();
     });
 
   return (
     <GestureDetector gesture={index === 3 ? gesture : Gesture.Race()}>
-      <Animated.View ref={ref} style={style}>
+      <Animated.View
+        ref={ref}
+        style={style}
+        onLayout={() => {
+          if (index === 3) {
+            console.log("LAYOUT");
+          }
+        }}
+      >
         {children}
       </Animated.View>
     </GestureDetector>

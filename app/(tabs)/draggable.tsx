@@ -1,14 +1,14 @@
 import { DraggableListProvider } from "@/components/draggable-list/DraggableList.provider";
 import { DraggableWrapper } from "@/components/draggable-list/DraggableWrapper";
-import { HelloWave } from "@/components/HelloWave";
 import { ThemedView } from "@/components/ThemedView";
 import { Data } from "@/constants/Data";
-import { useCallback } from "react";
-import { ListRenderItem, View } from "react-native";
+import { useCallback, useState } from "react";
+import { ListRenderItem } from "react-native";
 import Reanimated from "react-native-reanimated";
 
 export default function DraggableScreen() {
-  const renderItem = useCallback<ListRenderItem<(typeof Data)[number]>>(
+  const [data, setData] = useState(Data);
+  const renderItem = useCallback<ListRenderItem<(typeof data)[number]>>(
     ({ item, index }) => {
       return (
         <DraggableWrapper index={index}>
@@ -25,11 +25,20 @@ export default function DraggableScreen() {
     []
   );
 
+  const onItemMoved = (from: number, to: number) => {
+    console.log("ITEM MOVED", from, to);
+    setData((prev) => {
+      const newData = [...prev];
+      newData.splice(to, 0, newData.splice(from, 1)[0]);
+      return newData;
+    });
+  };
+
   console.log("RENDER");
   return (
     <ThemedView>
-      <DraggableListProvider rowHeight={100}>
-        <Reanimated.FlatList data={Data} renderItem={renderItem} />
+      <DraggableListProvider rowHeight={100} onItemMoved={onItemMoved}>
+        <Reanimated.FlatList data={data} renderItem={renderItem} />
       </DraggableListProvider>
     </ThemedView>
   );

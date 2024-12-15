@@ -2,6 +2,7 @@ import { createContext, useContext, useState } from "react";
 import {
   clamp,
   makeMutable,
+  runOnJS,
   SharedValue,
   useAnimatedReaction,
 } from "react-native-reanimated";
@@ -16,6 +17,7 @@ type DraggableListContextType = {
     h: number;
   }>;
   rowHeight: number;
+  onDragComplete: () => void;
 };
 const DraggableListContext = createContext<
   DraggableListContextType | undefined
@@ -35,10 +37,12 @@ export const useDraggableListContext = () => {
 
 type DraggableListProviderProps = {
   rowHeight: number;
+  onItemMoved?: (from: number, to: number) => void;
   children: React.ReactNode;
 };
 export const DraggableListProvider = ({
   rowHeight,
+  onItemMoved,
   children,
 }: DraggableListProviderProps) => {
   const active = makeMutable(false);
@@ -60,10 +64,16 @@ export const DraggableListProvider = ({
       if (cv !== pv) {
         // TODO update the max to the data length
         currentIndex.value = clamp(startIndex.value + cv, 0, 99);
-        console.log(currentIndex.value);
       }
     }
   );
+
+  const onDragComplete = () => {
+    "worklet";
+    if (onItemMoved && startIndex.value !== currentIndex.value) {
+      runOnJS(onItemMoved)(startIndex.value, currentIndex.value);
+    }
+  };
 
   return (
     <DraggableListContext.Provider
@@ -74,6 +84,7 @@ export const DraggableListProvider = ({
         draggedOffset,
         rowHeight,
         draggedItem,
+        onDragComplete,
       }}
     >
       {children}
