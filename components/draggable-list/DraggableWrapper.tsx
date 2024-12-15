@@ -9,7 +9,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useDraggableListContext } from "./DraggableList.provider";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 type DraggableWrapperProps = {
   index: number;
@@ -21,17 +21,7 @@ export const DraggableWrapper = ({
 }: DraggableWrapperProps) => {
   const data = useDraggableListContext();
   const ref = useAnimatedRef<Animated.View>();
-  const position = useSharedValue<
-    | {
-        x: number;
-        y: number;
-        w: number;
-        h: number;
-        px: number;
-        py: number;
-      }
-    | undefined
-  >(undefined);
+  const indexRef = useRef(index);
 
   // replace with redash
   const between = (
@@ -46,28 +36,46 @@ export const DraggableWrapper = ({
     }
     return value > lowerBound && value < upperBound;
   };
+  const translateY = useSharedValue(0);
 
-  const translateY = useDerivedValue(() => {
-    // if index is equal to start index and pan is currently active, return the dragged offset.
-    if (data.active.value) {
-      if (index === data.startIndex.value) {
-        return data.draggedOffset.value;
-      }
+  useEffect(() => {
+    if (indexRef.current !== index) {
+      indexRef.current = index;
+      translateY.value = 0;
+    }
+  }, [index]);
 
-      if (data.currentIndex.value !== data.startIndex.value) {
-        const lower = Math.min(data.currentIndex.value, data.startIndex.value);
-        const upper = Math.max(data.currentIndex.value, data.startIndex.value);
-        if (between(index, lower, upper)) {
-          const translateBy =
-            data.startIndex.value > data.currentIndex.value
-              ? data.rowHeight
-              : -data.rowHeight;
-          return withTiming(translateBy, { duration: 200 });
+  useAnimatedReaction(
+    () => {
+      return {
+        active: data.active.value,
+        startIndex: data.startIndex.value,
+        currentIndex: data.currentIndex.value,
+        draggedOffset: data.draggedOffset.value,
+      };
+    },
+    (cv, pv) => {
+      if (cv.active) {
+        if (index === cv.startIndex) {
+          translateY.value = cv.draggedOffset;
+        } else if (cv.currentIndex !== cv.startIndex) {
+          const lower = Math.min(cv.currentIndex, cv.startIndex);
+          const upper = Math.max(cv.currentIndex, cv.startIndex);
+          if (between(index, lower, upper)) {
+            const translateBy =
+              cv.startIndex > cv.currentIndex
+                ? data.rowHeight
+                : -data.rowHeight;
+            translateY.value = withTiming(translateBy, { duration: 200 });
+          } else {
+            translateY.value = withTiming(0, { duration: 200 });
+          }
+        } else {
+          translateY.value = withTiming(0, { duration: 200 });
         }
       }
     }
-    return withTiming(0, { duration: 200 });
-  });
+  );
 
   const style = useAnimatedStyle(() => {
     return {
@@ -77,7 +85,6 @@ export const DraggableWrapper = ({
 
   const gesture = Gesture.Pan()
     .onBegin(() => {
-      position.value = undefined;
       const measurements = ref.current?.measure(
         (x, y, width, height, pageX, pageY) => {
           data.draggedItem.value = {
