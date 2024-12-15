@@ -78,8 +78,10 @@ export const DraggableWrapper = ({
   );
 
   const style = useAnimatedStyle(() => {
+    const zIndex = data.startIndex.value === index ? 100 : 1;
     return {
       transform: [{ translateY: translateY.value }],
+      zIndex: zIndex,
     };
   });
 

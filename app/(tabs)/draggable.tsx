@@ -3,7 +3,7 @@ import { DraggableWrapper } from "@/components/draggable-list/DraggableWrapper";
 import { ThemedView } from "@/components/ThemedView";
 import { Data } from "@/constants/Data";
 import { useCallback, useState } from "react";
-import { ListRenderItem } from "react-native";
+import { FlatList, ListRenderItem } from "react-native";
 import Reanimated from "react-native-reanimated";
 
 export default function DraggableScreen() {
@@ -11,15 +11,11 @@ export default function DraggableScreen() {
   const renderItem = useCallback<ListRenderItem<(typeof data)[number]>>(
     ({ item, index }) => {
       return (
-        <DraggableWrapper index={index}>
+        <Reanimated.View style={{ paddingVertical: 2, paddingHorizontal: 10 }}>
           <Reanimated.View
-            style={{ paddingVertical: 2, paddingHorizontal: 10 }}
-          >
-            <Reanimated.View
-              style={{ backgroundColor: item.color, height: 100, padding: 20 }}
-            />
-          </Reanimated.View>
-        </DraggableWrapper>
+            style={{ backgroundColor: item.color, height: 100, padding: 20 }}
+          />
+        </Reanimated.View>
       );
     },
     []
@@ -36,7 +32,13 @@ export default function DraggableScreen() {
   return (
     <ThemedView>
       <DraggableListProvider rowHeight={100} onItemMoved={onItemMoved}>
-        <Reanimated.FlatList data={data} renderItem={renderItem} />
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          CellRendererComponent={({ index, children }) => (
+            <DraggableWrapper index={index}>{children}</DraggableWrapper>
+          )}
+        />
       </DraggableListProvider>
     </ThemedView>
   );
