@@ -9,7 +9,7 @@ import Reanimated from "react-native-reanimated";
 export default function DraggableScreen() {
   const [data, setData] = useState(Data);
   const renderItem = useCallback<ListRenderItem<(typeof data)[number]>>(
-    ({ item, index }) => {
+    ({ item }) => {
       return (
         <Reanimated.View style={{ paddingVertical: 2, paddingHorizontal: 10 }}>
           <Reanimated.View
