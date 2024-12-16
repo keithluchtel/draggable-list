@@ -106,10 +106,11 @@ export const DraggableWrapper = ({
     .onFinalize(() => {
       data.active.value = false;
       data.onDragComplete();
-    });
+    })
+    .activateAfterLongPress(500);
 
   return (
-    <GestureDetector gesture={index === 3 ? gesture : Gesture.Race()}>
+    <GestureDetector gesture={gesture}>
       <Animated.View ref={ref} style={style}>
         {children}
       </Animated.View>
