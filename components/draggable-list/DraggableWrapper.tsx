@@ -21,7 +21,6 @@ export const DraggableWrapper = ({
 }: DraggableWrapperProps) => {
   const data = useDraggableListContext();
   const ref = useAnimatedRef<Animated.View>();
-  const indexRef = useRef(index);
 
   // replace with redash
   const between = (
@@ -37,13 +36,6 @@ export const DraggableWrapper = ({
     return value > lowerBound && value < upperBound;
   };
   const translateY = useSharedValue(0);
-
-  useEffect(() => {
-    if (indexRef.current !== index) {
-      indexRef.current = index;
-      translateY.value = 0;
-    }
-  }, [index]);
 
   useAnimatedReaction(
     () => {
