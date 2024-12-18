@@ -99,8 +99,7 @@ export const DraggableWrapper = ({
     .onUpdate((event) => {
       data.draggedOffset.value = event.translationY;
     })
-    .onFinalize(() => {
-      data.active.value = false;
+    .onEnd(() => {
       let translateTarget = 0;
 
       if (
@@ -113,6 +112,9 @@ export const DraggableWrapper = ({
       translateY.value = withTiming(translateTarget, { duration: 200 }, () => {
         data.onDragComplete();
       });
+    })
+    .onFinalize(() => {
+      data.active.value = false;
     })
     .activateAfterLongPress(500);
 
