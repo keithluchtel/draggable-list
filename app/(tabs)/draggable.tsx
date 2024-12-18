@@ -32,7 +32,6 @@ export default function DraggableScreen() {
     setData((prev) => {
       const newData = [...prev];
       newData.splice(to, 0, newData.splice(from, 1)[0]);
-      console.log("updated data");
       return newData;
     });
   };
