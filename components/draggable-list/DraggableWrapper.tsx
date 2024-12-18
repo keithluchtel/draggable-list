@@ -5,6 +5,7 @@ import Animated, {
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
+  withSpring,
   withTiming,
 } from "react-native-reanimated";
 import { useDraggableListContext } from "./DraggableList.provider";
@@ -58,12 +59,15 @@ export const DraggableWrapper = ({
               cv.startIndex > cv.currentIndex
                 ? data.rowHeight
                 : -data.rowHeight;
-            translateY.value = withTiming(translateBy, { duration: 200 });
+            // translateY.value = withTiming(translateBy, { duration: 200 });
+            translateY.value = withSpring(translateBy);
           } else {
-            translateY.value = withTiming(0, { duration: 200 });
+            // translateY.value = withTiming(0, { duration: 200 });
+            translateY.value = withSpring(0);
           }
         } else {
-          translateY.value = withTiming(0, { duration: 200 });
+          // translateY.value = withTiming(0, { duration: 200 });
+          translateY.value = withSpring(0);
         }
       }
     }
@@ -109,7 +113,8 @@ export const DraggableWrapper = ({
         translateTarget =
           (data.currentIndex.value - data.startIndex.value) * data.rowHeight;
       }
-      translateY.value = withTiming(translateTarget, { duration: 200 }, () => {
+      // translateY.value = withTiming(translateTarget, { duration: 200 }, () => {
+      translateY.value = withSpring(translateTarget, {}, () => {
         data.onDragComplete();
       });
     })
