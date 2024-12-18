@@ -4,16 +4,21 @@ import { ThemedView } from "@/components/ThemedView";
 import { Data } from "@/constants/Data";
 import { useCallback, useState } from "react";
 import { FlatList, ListRenderItem } from "react-native";
-import Reanimated from "react-native-reanimated";
+import Reanimated, { useAnimatedRef } from "react-native-reanimated";
 
 export default function DraggableScreen() {
   const [data, setData] = useState(Data);
   const renderItem = useCallback<ListRenderItem<(typeof data)[number]>>(
     ({ item }) => {
       return (
-        <Reanimated.View style={{ paddingVertical: 2, paddingHorizontal: 10 }}>
+        <Reanimated.View style={{ paddingHorizontal: 10 }}>
           <Reanimated.View
-            style={{ backgroundColor: item.color, height: 100, padding: 20 }}
+            style={{
+              backgroundColor: item.color,
+              height: 100,
+              padding: 20,
+              borderRadius: 20,
+            }}
           />
         </Reanimated.View>
       );

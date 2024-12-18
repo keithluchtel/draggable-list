@@ -105,7 +105,18 @@ export const DraggableWrapper = ({
     })
     .onFinalize(() => {
       data.active.value = false;
-      data.onDragComplete();
+      let translateTarget = 0;
+
+      if (
+        index === data.startIndex.value &&
+        data.currentIndex.value !== data.startIndex.value
+      ) {
+        translateTarget =
+          (data.currentIndex.value - data.startIndex.value) * data.rowHeight;
+      }
+      translateY.value = withTiming(translateTarget, { duration: 200 }, () => {
+        data.onDragComplete();
+      });
     })
     .activateAfterLongPress(500);
 
