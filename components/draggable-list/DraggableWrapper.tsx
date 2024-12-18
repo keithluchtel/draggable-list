@@ -79,14 +79,18 @@ export const DraggableWrapper = ({
 
   const style = useAnimatedStyle(() => {
     const zIndex = data.startIndex.value === index ? 100 : 1;
+    const scale =
+      data.startIndex.value === index && data.active.value
+        ? withTiming(1.1, { duration: 200 })
+        : withTiming(1, { duration: 200 });
     return {
-      transform: [{ translateY: translateY.value }],
+      transform: [{ translateY: translateY.value }, { scale: scale }],
       zIndex: zIndex,
     };
   });
 
   const gesture = Gesture.Pan()
-    .onBegin(() => {
+    .onStart(() => {
       const measurements = ref.current?.measure(
         (x, y, width, height, pageX, pageY) => {
           data.draggedItem.value = {
