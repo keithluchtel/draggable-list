@@ -11,6 +11,7 @@ import Animated, {
 import { useDraggableListContext } from "./DraggableList.provider";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useEffect, useRef } from "react";
+import { between } from "react-native-redash";
 
 type DraggableWrapperProps = {
   index: number;
@@ -22,20 +23,6 @@ export const DraggableWrapper = ({
 }: DraggableWrapperProps) => {
   const data = useDraggableListContext();
   const ref = useAnimatedRef<Animated.View>();
-
-  // replace with redash
-  const between = (
-    value: number,
-    lowerBound: number,
-    upperBound: number,
-    inclusive = true
-  ) => {
-    "worklet";
-    if (inclusive) {
-      return value >= lowerBound && value <= upperBound;
-    }
-    return value > lowerBound && value < upperBound;
-  };
   const translateY = useSharedValue(0);
 
   useAnimatedReaction(
@@ -49,9 +36,13 @@ export const DraggableWrapper = ({
     },
     (cv, pv) => {
       if (cv.active) {
+        // if we are the item being reordered, follow the drag offset
         if (index === cv.startIndex) {
           translateY.value = cv.draggedOffset;
-        } else if (cv.currentIndex !== cv.startIndex) {
+        }
+        // Otherwise, check if the surrounding items needs to be moved
+        // due to the dragged item switching positions
+        else if (cv.currentIndex !== cv.startIndex) {
           const lower = Math.min(cv.currentIndex, cv.startIndex);
           const upper = Math.max(cv.currentIndex, cv.startIndex);
           if (between(index, lower, upper)) {
@@ -65,7 +56,9 @@ export const DraggableWrapper = ({
             // translateY.value = withTiming(0, { duration: 200 });
             translateY.value = withSpring(0);
           }
-        } else {
+        }
+        // otherwise, just revert back to default position
+        else {
           // translateY.value = withTiming(0, { duration: 200 });
           translateY.value = withSpring(0);
         }

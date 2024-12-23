@@ -8,15 +8,22 @@ import {
 } from "react-native-reanimated";
 
 type DraggableListContextType = {
+  /* whether we are actively dragging a list item */
   active: SharedValue<boolean>;
+  /* the index of the item that we started dragging */
   startIndex: SharedValue<number>;
+  /* the index of the item that we are currently dragging */
   currentIndex: SharedValue<number>;
+  /* the offset of the dragged item */
   draggedOffset: SharedValue<number>;
+  /* the position and height of the dragged item */
   draggedItem: SharedValue<{
     y: number;
     h: number;
   }>;
+  /* the height of each row in the list */
   rowHeight: number;
+  /* callback to be called when the drag is complete */
   onDragComplete: () => void;
 };
 const DraggableListContext = createContext<
