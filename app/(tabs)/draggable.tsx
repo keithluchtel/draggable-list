@@ -9,20 +9,22 @@ import Reanimated, { useAnimatedRef } from "react-native-reanimated";
 export default function DraggableScreen() {
   const [data, setData] = useState(Data);
   const renderItem = useCallback<ListRenderItem<(typeof data)[number]>>(
-    ({ item }) => {
+    ({ item, index }) => {
       return (
-        <Reanimated.View
-          style={{ paddingHorizontal: 10, height: 100, paddingVertical: 4 }}
-        >
+        <DraggableWrapper index={index}>
           <Reanimated.View
-            style={{
-              flex: 1,
-              backgroundColor: item.color,
-              padding: 20,
-              borderRadius: 20,
-            }}
-          />
-        </Reanimated.View>
+            style={{ paddingHorizontal: 10, height: 100, paddingVertical: 4 }}
+          >
+            <Reanimated.View
+              style={{
+                flex: 1,
+                backgroundColor: item.color,
+                padding: 20,
+                borderRadius: 20,
+              }}
+            />
+          </Reanimated.View>
+        </DraggableWrapper>
       );
     },
     []
@@ -39,13 +41,7 @@ export default function DraggableScreen() {
   return (
     <ThemedView>
       <DraggableListProvider rowHeight={100} onItemMoved={onItemMoved}>
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          CellRendererComponent={({ index, children }) => (
-            <DraggableWrapper index={index}>{children}</DraggableWrapper>
-          )}
-        />
+        <Reanimated.FlatList data={data} renderItem={renderItem} />
       </DraggableListProvider>
     </ThemedView>
   );
