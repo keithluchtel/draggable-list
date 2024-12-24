@@ -24,6 +24,8 @@ export const DraggableWrapper = ({
   const indexRef = useRef(index);
 
   useLayoutEffect(() => {
+    // reset the translation when the index changes
+    // use layout effect to ensure the index is updated before the next render
     if (indexRef.current !== index) {
       translateY.value = 0;
     }
