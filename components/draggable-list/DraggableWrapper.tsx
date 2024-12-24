@@ -1,16 +1,13 @@
 import Animated, {
-  LinearTransition,
   useAnimatedReaction,
   useAnimatedRef,
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue,
-  withSpring,
   withTiming,
 } from "react-native-reanimated";
 import { useDraggableListContext } from "./DraggableList.provider";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { between } from "react-native-redash";
 
 type DraggableWrapperProps = {
@@ -24,6 +21,14 @@ export const DraggableWrapper = ({
   const data = useDraggableListContext();
   const ref = useAnimatedRef<Animated.View>();
   const translateY = useSharedValue(0);
+  const indexRef = useRef(index);
+
+  useLayoutEffect(() => {
+    if (indexRef.current !== index) {
+      translateY.value = 0;
+    }
+    indexRef.current = index;
+  }, [index]);
 
   useAnimatedReaction(
     () => {
@@ -50,17 +55,14 @@ export const DraggableWrapper = ({
               cv.startIndex > cv.currentIndex
                 ? data.rowHeight
                 : -data.rowHeight;
-            // translateY.value = withTiming(translateBy, { duration: 200 });
-            translateY.value = withSpring(translateBy);
+            translateY.value = withTiming(translateBy, { duration: 200 });
           } else {
-            // translateY.value = withTiming(0, { duration: 200 });
-            translateY.value = withSpring(0);
+            translateY.value = withTiming(0, { duration: 200 });
           }
         }
         // otherwise, just revert back to default position
         else {
-          // translateY.value = withTiming(0, { duration: 200 });
-          translateY.value = withSpring(0);
+          translateY.value = withTiming(0, { duration: 200 });
         }
       }
     }
@@ -106,8 +108,7 @@ export const DraggableWrapper = ({
         translateTarget =
           (data.currentIndex.value - data.startIndex.value) * data.rowHeight;
       }
-      // translateY.value = withTiming(translateTarget, { duration: 200 }, () => {
-      translateY.value = withSpring(translateTarget, {}, () => {
+      translateY.value = withTiming(translateTarget, { duration: 200 }, () => {
         data.onDragComplete();
       });
     })
